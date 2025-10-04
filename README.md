@@ -9,6 +9,7 @@ Levenberg-Marquardt法を中心とした勾配ベースの最適化アルゴリ�
 
 ## 主な機能
 
+- **ニュートン法（1変数）** - 方程式 f(x) = 0 の数値解法
 - **ヤコビアン行列の数値微分計算** - ベクトル値関数のヤコビアン行列を自動計算
 - **勾配ベクトル計算** - スカラー関数の勾配を数値微分で計算
 - **Levenberg-Marquardt法** - 非線形最小二乗法による最適化
@@ -31,6 +32,40 @@ dotnet add package NumericalOptimization
 ```
 
 ## 使用例
+
+### ニュートン法による方程式の求解
+
+```csharp
+using NumericalOptimization;
+
+// 方程式 x^2 - 5 = 0 を解く（解は √5 ≈ 2.236）
+Func<double, double> function = (x) => x * x - 5.0;
+
+// 数値微分版（導関数を自動計算）
+var result = NumericalOptimizer.Newton(
+    initialGuess: 1.0,
+    function: function,
+    tolerance: 1e-6,
+    maxIterations: 100
+);
+
+if (result.Success)
+{
+    Console.WriteLine($"解: {result.Root}");  // 約 2.236
+    Console.WriteLine($"関数値: {result.FunctionValue}");  // ≈ 0
+    Console.WriteLine($"反復回数: {result.Iterations}");
+}
+
+// 導関数指定版（より高速）
+Func<double, double> derivative = (x) => 2.0 * x;
+
+var result2 = NumericalOptimizer.Newton(
+    initialGuess: 1.0,
+    function: function,
+    derivative: derivative,
+    tolerance: 1e-6
+);
+```
 
 ### Levenberg-Marquardt法による最適化
 
@@ -96,6 +131,8 @@ Console.WriteLine($"ヤコビアン行列:\n{jacobian}");
 
 #### メソッド
 
+- `Newton(initialGuess, function, tolerance, maxIterations, stepSize)` - ニュートン法による求解（数値微分版）
+- `Newton(initialGuess, function, derivative, tolerance, maxIterations)` - ニュートン法による求解（導関数指定版）
 - `ComputeJacobian(point, function, stepSize)` - ヤコビアン行列を計算
 - `ComputeGradient(point, function, stepSize)` - 勾配ベクトルを計算
 - `LevenbergMarquardtStep(currentPoint, residualFunction, lambda, stepSize)` - L-M法の1ステップ実行
@@ -103,6 +140,17 @@ Console.WriteLine($"ヤコビアン行列:\n{jacobian}");
 - `ToMathNetVector(Vector3)` - System.Numerics.Vector3からMathNet.Numericsベクトルに変換
 - `ToMathNetVector2D(Vector3)` - Vector3から2次元MathNetベクトルに変換（Z座標を無視）
 - `ToVector3(Vector<double>)` - MathNet.NumericsベクトルからVector3に変換
+
+### NewtonResult クラス
+
+ニュートン法の求解結果を格納するクラス
+
+#### プロパティ
+
+- `Success` (bool) - 求解が成功したか
+- `Root` (double) - 求めた解（根）
+- `FunctionValue` (double) - 解における関数値 f(x)
+- `Iterations` (int) - 反復回数
 
 ### OptimizationResult クラス
 

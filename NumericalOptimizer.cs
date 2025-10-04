@@ -247,6 +247,146 @@ namespace NumericalOptimization
             else
                 throw new ArgumentException("ベクトルの次元は2または3である必要があります");
         }
+
+        /// <summary>
+        /// ニュートン法による1変数方程式の求解（数値微分版）
+        /// </summary>
+        /// <param name="initialGuess">初期推定値</param>
+        /// <param name="function">方程式 f(x) = 0 の左辺</param>
+        /// <param name="tolerance">収束判定の許容誤差</param>
+        /// <param name="maxIterations">最大反復回数</param>
+        /// <param name="stepSize">数値微分のステップサイズ</param>
+        /// <returns>求解結果</returns>
+        public static NewtonResult Newton(
+            double initialGuess,
+            Func<double, double> function,
+            double tolerance = 1e-6,
+            int maxIterations = 100,
+            double stepSize = 1e-6)
+        {
+            if (function == null)
+                throw new ArgumentNullException(nameof(function));
+            if (tolerance <= 0)
+                throw new ArgumentException("許容誤差は正の値である必要があります", nameof(tolerance));
+            if (stepSize <= 0)
+                throw new ArgumentException("ステップサイズは正の値である必要があります", nameof(stepSize));
+
+            double x = initialGuess;
+
+            for (int iteration = 0; iteration < maxIterations; iteration++)
+            {
+                double fx = function(x);
+
+                // 収束判定
+                if (Math.Abs(fx) < tolerance)
+                {
+                    return new NewtonResult
+                    {
+                        Success = true,
+                        Root = x,
+                        FunctionValue = fx,
+                        Iterations = iteration + 1
+                    };
+                }
+
+                // 数値微分で導関数を計算
+                double fxPlusH = function(x + stepSize);
+                double derivative = (fxPlusH - fx) / stepSize;
+
+                // 導関数が0に近い場合は失敗
+                if (Math.Abs(derivative) < 1e-12)
+                {
+                    return new NewtonResult
+                    {
+                        Success = false,
+                        Root = x,
+                        FunctionValue = fx,
+                        Iterations = iteration + 1
+                    };
+                }
+
+                // ニュートン法の更新
+                x = x - fx / derivative;
+            }
+
+            // 最大反復回数に達した
+            return new NewtonResult
+            {
+                Success = false,
+                Root = x,
+                FunctionValue = function(x),
+                Iterations = maxIterations
+            };
+        }
+
+        /// <summary>
+        /// ニュートン法による1変数方程式の求解（導関数指定版）
+        /// </summary>
+        /// <param name="initialGuess">初期推定値</param>
+        /// <param name="function">方程式 f(x) = 0 の左辺</param>
+        /// <param name="derivative">導関数 f'(x)</param>
+        /// <param name="tolerance">収束判定の許容誤差</param>
+        /// <param name="maxIterations">最大反復回数</param>
+        /// <returns>求解結果</returns>
+        public static NewtonResult Newton(
+            double initialGuess,
+            Func<double, double> function,
+            Func<double, double> derivative,
+            double tolerance = 1e-6,
+            int maxIterations = 100)
+        {
+            if (function == null)
+                throw new ArgumentNullException(nameof(function));
+            if (derivative == null)
+                throw new ArgumentNullException(nameof(derivative));
+            if (tolerance <= 0)
+                throw new ArgumentException("許容誤差は正の値である必要があります", nameof(tolerance));
+
+            double x = initialGuess;
+
+            for (int iteration = 0; iteration < maxIterations; iteration++)
+            {
+                double fx = function(x);
+
+                // 収束判定
+                if (Math.Abs(fx) < tolerance)
+                {
+                    return new NewtonResult
+                    {
+                        Success = true,
+                        Root = x,
+                        FunctionValue = fx,
+                        Iterations = iteration + 1
+                    };
+                }
+
+                double dfx = derivative(x);
+
+                // 導関数が0に近い場合は失敗
+                if (Math.Abs(dfx) < 1e-12)
+                {
+                    return new NewtonResult
+                    {
+                        Success = false,
+                        Root = x,
+                        FunctionValue = fx,
+                        Iterations = iteration + 1
+                    };
+                }
+
+                // ニュートン法の更新
+                x = x - fx / dfx;
+            }
+
+            // 最大反復回数に達した
+            return new NewtonResult
+            {
+                Success = false,
+                Root = x,
+                FunctionValue = function(x),
+                Iterations = maxIterations
+            };
+        }
     }
 
     /// <summary>
@@ -262,6 +402,24 @@ namespace NumericalOptimization
 
         /// <summary>最終的な残差のノルム</summary>
         public double ResidualNorm { get; set; }
+
+        /// <summary>反復回数</summary>
+        public int Iterations { get; set; }
+    }
+
+    /// <summary>
+    /// ニュートン法の求解結果を格納するクラス
+    /// </summary>
+    public class NewtonResult
+    {
+        /// <summary>求解が成功したか</summary>
+        public bool Success { get; set; }
+
+        /// <summary>求めた解（根）</summary>
+        public double Root { get; set; }
+
+        /// <summary>解における関数値 f(x)</summary>
+        public double FunctionValue { get; set; }
 
         /// <summary>反復回数</summary>
         public int Iterations { get; set; }

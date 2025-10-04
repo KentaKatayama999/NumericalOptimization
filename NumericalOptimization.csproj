@@ -7,16 +7,16 @@
     <Nullable>enable</Nullable>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <PackageId>NumericalOptimization</PackageId>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <Authors>otamo</Authors>
     <Company>NumericalOptimization</Company>
-    <Description>Numerical optimization utilities including Levenberg-Marquardt method and Jacobian matrix computation.</Description>
-    <PackageDescription>Reusable numerical optimization library with gradient-based methods for non-linear optimization problems.</PackageDescription>
-    <RepositoryUrl>https://github.com/otamo/Geometry</RepositoryUrl>
+    <Description>Numerical optimization utilities including Newton's method, Levenberg-Marquardt method and Jacobian matrix computation.</Description>
+    <PackageDescription>Reusable numerical optimization library with Newton's method and gradient-based methods for non-linear optimization problems.</PackageDescription>
+    <RepositoryUrl>https://github.com/KentaKatayama999/NumericalOptimization</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageProjectUrl>https://github.com/otamo/Geometry</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/KentaKatayama999/NumericalOptimization</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageTags>Optimization;Numerical;Levenberg-Marquardt;Jacobian;Gradient</PackageTags>
+    <PackageTags>Optimization;Numerical;Newton;Levenberg-Marquardt;Jacobian;Gradient</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
